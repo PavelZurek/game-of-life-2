@@ -2,6 +2,7 @@
   <div>
     <div id="controlPanel">
       <button v-on:click="onPausePlayButtonClick" title="Play/Pause">⏸</button>
+      <button v-on:click="tick" v-bind:disabled="!!this.intervalId" title="Step">🔂</button>
     </div>
     <canvas id="canvas"></canvas>
   </div>
@@ -12,7 +13,8 @@
     name: "GameOfLife",
     data() {
       return {
-        cellSize: 5
+        cellSize: 5,
+        intervalId: undefined
       }
     },
     mounted() {
