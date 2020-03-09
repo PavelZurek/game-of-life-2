@@ -1,5 +1,10 @@
 <template>
-  <canvas id="canvas"></canvas>
+  <div>
+    <div id="controlPanel">
+      <button v-on:click="onPausePlayButtonClick" title="Play/Pause">⏸</button>
+    </div>
+    <canvas id="canvas"></canvas>
+  </div>
 </template>
 
 <script>
@@ -17,9 +22,25 @@
       this.resizeOnPage();
 
       this.draw();
-      setInterval(this.tick, 200);
+      this.pausePlay();
     },
     methods: {
+      onPausePlayButtonClick(mouseEvent) {
+        this.pausePlay();
+        if (this.intervalId) {
+          mouseEvent.target.innerText = '⏸';
+        } else {
+          mouseEvent.target.innerText = '▶';
+        }
+      },
+      pausePlay() {
+        if (this.intervalId) {
+          clearInterval(this.intervalId);
+          this.intervalId = undefined;
+        } else {
+          this.intervalId = setInterval(this.tick, 200);
+        }
+      },
       resizeOnPage() {
         this.canvasElement.width  = window.innerWidth;
         this.canvasElement.height = window.innerHeight;
@@ -111,5 +132,19 @@
 </script>
 
 <style scoped>
-
+#controlPanel {
+  position: absolute;
+  margin: 10px;
+  padding: 10px;
+  opacity: 0.2;
+  background-color: #A1A1A1;
+}
+#controlPanel:hover {
+  opacity: 0.8;
+}
+#controlPanel > button {
+  padding: 0;
+  background: transparent;
+  border: none !important;
+}
 </style>
