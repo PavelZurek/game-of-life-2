@@ -2,7 +2,8 @@
   <div>
     <div id="controlPanel">
       <button v-on:click="onPausePlayButtonClick" title="Play/Pause">⏸</button>
-      <button v-on:click="tick" v-bind:disabled="!!this.intervalId" title="Step">🔂</button>
+      <button v-on:click="tick" title="Step" v-bind:disabled="intervalId">🔂</button>
+      <button v-on:click="onGridButtonClick" title="Show/Hide grid">🌐</button>
     </div>
     <canvas id="canvas"></canvas>
   </div>
@@ -14,6 +15,7 @@
     data() {
       return {
         cellSize: 5,
+        showGrid: false,
         intervalId: undefined
       }
     },
@@ -27,6 +29,12 @@
       this.pausePlay();
     },
     methods: {
+      onGridButtonClick() {
+        this.showGrid = !this.showGrid;
+        if (!this.intervalId) {
+          this.draw();
+        }
+      },
       onPausePlayButtonClick(mouseEvent) {
         this.pausePlay();
         if (this.intervalId) {
@@ -75,6 +83,25 @@
               );
             }
           }
+        }
+
+        if (this.showGrid) {
+          this.canvas.lineWidth = 0.5;
+          this.canvas.strokeStyle = '#FFFFFF';
+          this.canvas.beginPath();
+
+          for (let i = 0; i < this.sizeX; i++) {
+            const x = i * this.cellSize;
+            this.canvas.moveTo(x, 0);
+            this.canvas.lineTo(x, this.canvasElement.height);
+          }
+          for (let i = 0; i < this.sizeY; i++) {
+            const y = i * this.cellSize;
+            this.canvas.moveTo(0, y);
+            this.canvas.lineTo(this.canvasElement.width, y);
+          }
+
+          this.canvas.stroke();
         }
       },
       tick () {
