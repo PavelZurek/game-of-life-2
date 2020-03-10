@@ -48,7 +48,7 @@
           clearInterval(this.intervalId);
           this.intervalId = undefined;
         } else {
-          this.intervalId = setInterval(this.tick, 200);
+          this.intervalId = setInterval(this.tick, 100);
         }
       },
       resizeOnPage() {
@@ -71,10 +71,10 @@
         this.canvas.fillStyle = '#000000';
         this.canvas.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
-        this.canvas.fillStyle = '#00FF00';
         for (let i = 0; i < this.sizeX; i++) {
           for (let j = 0; j < this.sizeY; j++) {
             if (this.data[i][j]) {
+              this.canvas.fillStyle = this.getCellColor(this.data[i][j]);
               this.canvas.fillRect(
                 i * this.cellSize,
                 j * this.cellSize,
@@ -104,6 +104,16 @@
           this.canvas.stroke();
         }
       },
+      getCellColor (value) {
+        value -= 1;
+        if (value < 256) {
+          return `rgb(${value},255,0)`;
+        } else if (value > 512) {
+          return 'rgb(255,0,0)';
+        } else {
+          return `rgb(255,${512 - value},0)`;
+        }
+      },
       tick () {
         this.generation();
         this.draw();
@@ -116,9 +126,13 @@
           for (let j = 0; j < this.sizeY; j++) {
             let liveNeighboursCount = this.numberOfLiveNeighbours(i, j);
             newRow[j] = this.data[i][j];
-            if (this.data[i][j] === 1) {
+            if (this.data[i][j] > 0) {
               if (liveNeighboursCount < 2 || liveNeighboursCount > 3) {
                 newRow[j] = 0;
+              } else {
+                if (newRow[j] < 513) {
+                  newRow[j] ++;
+                }
               }
             } else {
               if (liveNeighboursCount === 3) {
@@ -154,7 +168,7 @@
         if (column >= this.sizeY) {
           column = 0;
         }
-        return this.data[row][column];
+        return this.data[row][column] > 0 ? 1 : 0;
       }
     }
   }
