@@ -4,6 +4,9 @@
       <button v-on:click="onPausePlayButtonClick" title="Play/Pause">⏸</button>
       <button v-on:click="tick" title="Step" v-bind:disabled="intervalId">🔂</button>
       <button v-on:click="onGridButtonClick" title="Show/Hide grid">🌐</button>
+      <input type="color" v-model="backgroundColor" title="Background color" />
+      <input type="checkbox" v-model="useCustomCellColor" title="Use single color for cells" />
+      <input type="color" v-model="cellColor" title="Cell color" v-bind:disabled="!useCustomCellColor" />
     </div>
     <canvas id="canvas"></canvas>
   </div>
@@ -16,6 +19,9 @@
       return {
         cellSize: 5,
         showGrid: false,
+        backgroundColor: '#000000',
+        useCustomCellColor: false,
+        cellColor: '#00FF00',
         intervalId: undefined
       }
     },
@@ -43,6 +49,9 @@
           mouseEvent.target.innerText = '▶';
         }
       },
+      onBgColorInputChange (event) {
+        this.backgroundColor = event.target.value;
+      },
       pausePlay() {
         if (this.intervalId) {
           clearInterval(this.intervalId);
@@ -68,7 +77,7 @@
         }
       },
       draw() {
-        this.canvas.fillStyle = '#000000';
+        this.canvas.fillStyle = this.backgroundColor;
         this.canvas.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
         for (let i = 0; i < this.sizeX; i++) {
@@ -105,13 +114,17 @@
         }
       },
       getCellColor (value) {
+        if (this.useCustomCellColor) {
+          return this.cellColor;
+        }
+
         value -= 1;
         if (value < 256) {
           return `rgb(${value},255,0)`;
-        } else if (value > 512) {
+        } else if (value >= 512) {
           return 'rgb(255,0,0)';
         } else {
-          return `rgb(255,${512 - value},0)`;
+          return `rgb(255,${511 - value},0)`;
         }
       },
       tick () {
