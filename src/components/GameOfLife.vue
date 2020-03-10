@@ -1,12 +1,27 @@
 <template>
   <div>
     <div id="controlPanel">
-      <button v-on:click="onPausePlayButtonClick" title="Play/Pause">⏸</button>
-      <button v-on:click="tick" title="Step" v-bind:disabled="intervalId">🔂</button>
-      <button v-on:click="onGridButtonClick" title="Show/Hide grid">🌐</button>
-      <input type="color" v-model="backgroundColor" title="Background color" />
-      <input type="checkbox" v-model="useCustomCellColor" title="Use single color for cells" />
-      <input type="color" v-model="cellColor" title="Cell color" v-bind:disabled="!useCustomCellColor" />
+      <button title="Play/Pause"
+              v-on:click="onPausePlayButtonClick">⏸</button>
+      <button title="Step"
+              v-on:click="tick"
+              v-bind:disabled="intervalId">🔂</button>
+      <button title="Show/Hide grid"
+              v-on:click="onGridButtonClick">🌐</button>
+
+      <input type="color"
+             title="Background color"
+             v-model="style.backgroundColor"
+             v-on:change="draw" />
+      <input type="checkbox"
+             title="Use single color for cells"
+             v-model="style.useCustomCellColor"
+             v-on:change="draw" />
+      <input type="color"
+             title="Cell color"
+             v-model="style.cellColor"
+             v-on:change="draw"
+             v-bind:disabled="!style.useCustomCellColor" />
     </div>
     <canvas id="canvas"></canvas>
   </div>
@@ -17,12 +32,19 @@
     name: "GameOfLife",
     data() {
       return {
-        cellSize: 5,
-        showGrid: false,
-        backgroundColor: '#000000',
-        useCustomCellColor: false,
-        cellColor: '#00FF00',
-        intervalId: undefined
+        sizeX: undefined,
+        sizeY: undefined,
+        data: undefined,
+        canvasElement: undefined,
+        canvas: undefined,
+        intervalId: undefined,
+        style: {
+          cellSize: 5,
+          showGrid: false,
+          backgroundColor: '#000000',
+          useCustomCellColor: false,
+          cellColor: '#00FF00'
+        }
       }
     },
     mounted() {
@@ -36,7 +58,7 @@
     },
     methods: {
       onGridButtonClick() {
-        this.showGrid = !this.showGrid;
+        this.style.showGrid = !this.style.showGrid;
         if (!this.intervalId) {
           this.draw();
         }
@@ -48,9 +70,6 @@
         } else {
           mouseEvent.target.innerText = '▶';
         }
-      },
-      onBgColorInputChange (event) {
-        this.backgroundColor = event.target.value;
       },
       pausePlay() {
         if (this.intervalId) {
@@ -64,8 +83,8 @@
         this.canvasElement.width  = window.innerWidth;
         this.canvasElement.height = window.innerHeight;
 
-        this.sizeX = Math.floor(this.canvasElement.width / this.cellSize);
-        this.sizeY = Math.floor(this.canvasElement.height / this.cellSize);
+        this.sizeX = Math.floor(this.canvasElement.width / this.style.cellSize);
+        this.sizeY = Math.floor(this.canvasElement.height / this.style.cellSize);
 
         this.data = [];
         for (let i = 0; i < this.sizeX; i++) {
@@ -77,7 +96,7 @@
         }
       },
       draw() {
-        this.canvas.fillStyle = this.backgroundColor;
+        this.canvas.fillStyle = this.style.backgroundColor;
         this.canvas.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
         for (let i = 0; i < this.sizeX; i++) {
@@ -85,27 +104,27 @@
             if (this.data[i][j]) {
               this.canvas.fillStyle = this.getCellColor(this.data[i][j]);
               this.canvas.fillRect(
-                i * this.cellSize,
-                j * this.cellSize,
-                this.cellSize,
-                this.cellSize
+                i * this.style.cellSize,
+                j * this.style.cellSize,
+                this.style.cellSize,
+                this.style.cellSize
               );
             }
           }
         }
 
-        if (this.showGrid) {
+        if (this.style.showGrid) {
           this.canvas.lineWidth = 0.5;
           this.canvas.strokeStyle = '#FFFFFF';
           this.canvas.beginPath();
 
           for (let i = 0; i < this.sizeX; i++) {
-            const x = i * this.cellSize;
+            const x = i * this.style.cellSize;
             this.canvas.moveTo(x, 0);
             this.canvas.lineTo(x, this.canvasElement.height);
           }
           for (let i = 0; i < this.sizeY; i++) {
-            const y = i * this.cellSize;
+            const y = i * this.style.cellSize;
             this.canvas.moveTo(0, y);
             this.canvas.lineTo(this.canvasElement.width, y);
           }
@@ -114,8 +133,8 @@
         }
       },
       getCellColor (value) {
-        if (this.useCustomCellColor) {
-          return this.cellColor;
+        if (this.style.useCustomCellColor) {
+          return this.style.cellColor;
         }
 
         value -= 1;
@@ -170,15 +189,13 @@
       },
       getCellValue (row, column) {
         if (row < 0) {
-          row = this.sizeX - 1;
-        }
-        if (row >= this.sizeX) {
+          row = this.data.length - 1;
+        } else if (row >= this.data.length) {
           row = 0;
         }
         if (column < 0) {
-          column = this.sizeY - 1;
-        }
-        if (column >= this.sizeY) {
+          column = this.data[row].length - 1;
+        } else if (column >= this.data[row].length) {
           column = 0;
         }
         return this.data[row][column] > 0 ? 1 : 0;
