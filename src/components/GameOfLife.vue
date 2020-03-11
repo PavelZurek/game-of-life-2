@@ -27,7 +27,9 @@
              v-on:change="draw"
              v-bind:disabled="!style.useCustomCellColor" />
     </div>
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas"
+            v-on:click="onCanvasMoveOrClick"
+            v-on:mousemove="onCanvasMoveOrClick"></canvas>
   </div>
 </template>
 
@@ -77,6 +79,15 @@
           mouseEvent.target.innerText = '⏸';
         } else {
           mouseEvent.target.innerText = '▶';
+        }
+      },
+      onCanvasMoveOrClick(mouseEvent) {
+        const x = Math.floor(mouseEvent.clientX / this.style.cellSize);
+        const y = Math.floor(mouseEvent.clientY / this.style.cellSize);
+
+        if (mouseEvent.type === 'mousemove' && mouseEvent.buttons === 1 || mouseEvent.type === 'click') {
+          this.data[x][y] = mouseEvent.shiftKey ? 0 : 1;
+          this.draw();
         }
       },
       pausePlay() {
