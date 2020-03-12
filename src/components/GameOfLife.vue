@@ -1,6 +1,10 @@
 <template>
   <div>
     <div id="controlPanel">
+      <div id="controlPanelHeader">
+        Control panel
+      </div>
+
       <button title="Play/Pause"
               v-on:click="onPausePlayButtonClick">⏸</button>
       <button title="Step"
@@ -28,6 +32,8 @@
 </template>
 
 <script>
+  import { dragElement } from "./dragElement.ts";
+
   export default {
     name: "GameOfLife",
     data() {
@@ -39,7 +45,7 @@
         canvas: undefined,
         intervalId: undefined,
         style: {
-          cellSize: 5,
+          cellSize: 40,
           showGrid: false,
           backgroundColor: '#000000',
           useCustomCellColor: false,
@@ -48,6 +54,8 @@
       }
     },
     mounted() {
+      dragElement('controlPanel', 'controlPanelHeader', {top: '10px', left: '10px'});
+
       this.canvasElement = document.getElementById("canvas");
       this.canvas = this.canvasElement.getContext("2d");
 
@@ -205,9 +213,15 @@
 </script>
 
 <style scoped>
+#controlPanelHeader {
+  background-color: #31a19f;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: move;
+  margin: -10px -10px 10px -10px;
+}
 #controlPanel {
   position: absolute;
-  margin: 10px;
   padding: 10px;
   opacity: 0.2;
   background-color: #A1A1A1;
