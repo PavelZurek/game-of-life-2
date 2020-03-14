@@ -2,30 +2,35 @@
   <div>
     <div id="controlPanel">
       <div id="controlPanelHeader">
+        <button :title="controlPanelCollapsed ? 'Show control panel' : 'Hide control panel'"
+                v-on:click="onControlPanelCollapseClick">{{ controlPanelCollapsed ? '&darr;' : '&uarr;' }}</button>
         Control panel
       </div>
 
-      <button title="Play/Pause"
-              v-on:click="onPausePlayButtonClick">⏸</button>
-      <button title="Step"
-              v-on:click="tick"
-              v-bind:disabled="intervalId">🔂</button>
-      <button title="Show/Hide grid"
-              v-on:click="onGridButtonClick">🌐</button>
+      <div id="controlPanelBody"
+           v-if="!this.controlPanelCollapsed">
+        <button title="Play/Pause"
+                v-on:click="onPausePlayButtonClick">⏸</button>
+        <button title="Step"
+                v-on:click="tick"
+                v-bind:disabled="intervalId">🔂</button>
+        <button title="Show/Hide grid"
+                v-on:click="onGridButtonClick">🌐</button>
 
-      <input type="color"
-             title="Background color"
-             v-model="style.backgroundColor"
-             v-on:change="draw" />
-      <input type="checkbox"
-             title="Use single color for cells"
-             v-model="style.useCustomCellColor"
-             v-on:change="draw" />
-      <input type="color"
-             title="Cell color"
-             v-model="style.cellColor"
-             v-on:change="draw"
-             v-bind:disabled="!style.useCustomCellColor" />
+        <input type="color"
+               title="Background color"
+               v-model="style.backgroundColor"
+               v-on:change="draw" />
+        <input type="checkbox"
+               title="Use single color for cells"
+               v-model="style.useCustomCellColor"
+               v-on:change="draw" />
+        <input type="color"
+               title="Cell color"
+               v-model="style.cellColor"
+               v-on:change="draw"
+               v-bind:disabled="!style.useCustomCellColor" />
+      </div>
     </div>
     <canvas id="canvas"
             v-on:click="onCanvasMoveOrClick"
@@ -46,6 +51,7 @@
         canvasElement: undefined,
         canvas: undefined,
         intervalId: undefined,
+        controlPanelCollapsed: true,
         style: {
           cellSize: 40,
           showGrid: false,
@@ -67,6 +73,9 @@
       this.pausePlay();
     },
     methods: {
+      onControlPanelCollapseClick() {
+        this.controlPanelCollapsed = !this.controlPanelCollapsed;
+      },
       onGridButtonClick() {
         this.style.showGrid = !this.style.showGrid;
         if (!this.intervalId) {
@@ -224,23 +233,26 @@
 </script>
 
 <style scoped>
-#controlPanelHeader {
-  background-color: #31a19f;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: move;
-  margin: -10px -10px 10px -10px;
-}
 #controlPanel {
   position: absolute;
-  padding: 10px;
+  padding: 0;
   opacity: 0.2;
   background-color: #A1A1A1;
 }
 #controlPanel:hover {
   opacity: 0.8;
 }
-#controlPanel > button {
+#controlPanelHeader {
+  background-color: #31a19f;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: move;
+  padding-right: 5px;
+}
+#controlPanelBody {
+  margin: 10px;
+}
+#controlPanelBody > button {
   padding: 0;
   background: transparent;
   border: none !important;
