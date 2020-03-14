@@ -1,37 +1,12 @@
 <template>
   <div>
-    <div id="controlPanel">
-      <div id="controlPanelHeader">
-        <button :title="controlPanelCollapsed ? 'Show control panel' : 'Hide control panel'"
-                v-on:click="onControlPanelCollapseClick">{{ controlPanelCollapsed ? '&darr;' : '&uarr;' }}</button>
-        Control panel
-      </div>
-
-      <div id="controlPanelBody"
-           v-if="!this.controlPanelCollapsed">
-        <button title="Play/Pause"
-                v-on:click="onPausePlayButtonClick">⏸</button>
-        <button title="Step"
-                v-on:click="tick"
-                v-bind:disabled="intervalId">🔂</button>
-        <button title="Show/Hide grid"
-                v-on:click="onGridButtonClick">🌐</button>
-
-        <input type="color"
-               title="Background color"
-               v-model="style.backgroundColor"
-               v-on:change="draw" />
-        <input type="checkbox"
-               title="Use single color for cells"
-               v-model="style.useCustomCellColor"
-               v-on:change="draw" />
-        <input type="color"
-               title="Cell color"
-               v-model="style.cellColor"
-               v-on:change="draw"
-               v-bind:disabled="!style.useCustomCellColor" />
-      </div>
-    </div>
+    <ControlPanel :game-controller="{
+      pausePlay: pausePlay,
+      step: tick,
+      isGameRunning: isGameRunning,
+      setStyle: setStyle,
+      getStyle: getStyle
+    }" />
     <canvas id="canvas"
             v-on:click="onCanvasMoveOrClick"
             v-on:mousemove="onCanvasMoveOrClick"></canvas>
@@ -39,10 +14,13 @@
 </template>
 
 <script>
-  import { dragElement } from "./dragElement.ts";
+  import ControlPanel from "./ControlPanel";
 
   export default {
     name: "GameOfLife",
+    components: {
+      ControlPanel
+    },
     data() {
       return {
         sizeX: undefined,
@@ -51,7 +29,6 @@
         canvasElement: undefined,
         canvas: undefined,
         intervalId: undefined,
-        controlPanelCollapsed: true,
         style: {
           cellSize: 40,
           showGrid: false,
@@ -62,8 +39,6 @@
       }
     },
     mounted() {
-      dragElement('controlPanel', 'controlPanelHeader', {top: '10px', left: '10px'});
-
       this.canvasElement = document.getElementById("canvas");
       this.canvas = this.canvasElement.getContext("2d");
 
@@ -73,23 +48,6 @@
       this.pausePlay();
     },
     methods: {
-      onControlPanelCollapseClick() {
-        this.controlPanelCollapsed = !this.controlPanelCollapsed;
-      },
-      onGridButtonClick() {
-        this.style.showGrid = !this.style.showGrid;
-        if (!this.intervalId) {
-          this.draw();
-        }
-      },
-      onPausePlayButtonClick(mouseEvent) {
-        this.pausePlay();
-        if (this.intervalId) {
-          mouseEvent.target.innerText = '⏸';
-        } else {
-          mouseEvent.target.innerText = '▶';
-        }
-      },
       onCanvasMoveOrClick(mouseEvent) {
         const x = Math.floor(mouseEvent.clientX / this.style.cellSize);
         const y = Math.floor(mouseEvent.clientY / this.style.cellSize);
@@ -98,6 +56,22 @@
           this.data[x][y] = mouseEvent.shiftKey ? 0 : 1;
           this.draw();
         }
+      },
+      setStyle(style) {
+        this.style = {
+          ...this.style,
+          ...style
+        };
+
+        if (!this.isGameRunning()) {
+          this.draw();
+        }
+      },
+      getStyle() {
+        return this.style;
+      },
+      isGameRunning() {
+        return !!this.intervalId;
       },
       pausePlay() {
         if (this.intervalId) {
@@ -233,28 +207,5 @@
 </script>
 
 <style scoped>
-#controlPanel {
-  position: absolute;
-  padding: 0;
-  opacity: 0.2;
-  background-color: #A1A1A1;
-}
-#controlPanel:hover {
-  opacity: 0.8;
-}
-#controlPanelHeader {
-  background-color: #31a19f;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: move;
-  padding-right: 5px;
-}
-#controlPanelBody {
-  margin: 10px;
-}
-#controlPanelBody > button {
-  padding: 0;
-  background: transparent;
-  border: none !important;
-}
+
 </style>
