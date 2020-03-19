@@ -14,6 +14,8 @@
               v-on:click="onStepButtonClick">🔂</button>
       <button title="Show/Hide grid"
               v-on:click="onGridButtonClick">🌐</button>
+      <button title="Show/Hide FPS"
+              v-on:click="onFpsButtonClick">FPS</button>
 
       <input type="color"
              title="Background color"
@@ -69,6 +71,9 @@
       },
       updateStyles() {
         this.gameController.setStyle(this.style);
+      },
+      onFpsButtonClick() {
+        this.gameController.toggleStats();
       },
       onGridButtonClick() {
         this.style.showGrid = !this.style.showGrid;

@@ -5,16 +5,23 @@
       step: tick,
       isGameRunning: isGameRunning,
       setStyle: setStyle,
-      getStyle: getStyle
+      getStyle: getStyle,
+      toggleStats: toggleStats
     }" />
     <canvas id="canvas"
             v-on:click="onCanvasMoveOrClick"
             v-on:mousemove="onCanvasMoveOrClick"></canvas>
+    <div v-if="this.fps.show" id="fps">
+      <div title="current">C: {{ this.fps.currentFps }}</div>
+      <div title="average per last 50 frames">A: {{ this.fps.averageFps }}</div>
+    </div>
   </div>
 </template>
 
 <script>
   import ControlPanel from "./ControlPanel";
+
+  const AVERAGE_FPS_FRAMES_COUNT = 50;
 
   export default {
     name: "GameOfLife",
@@ -29,8 +36,15 @@
         canvasElement: undefined,
         canvas: undefined,
         intervalId: undefined,
+        fps: {
+          show: true,
+          currentTime: undefined,
+          frameTimeSpacing: [],
+          currentFps: undefined,
+          averageFps: undefined
+        },
         style: {
-          cellSize: 40,
+          cellSize: 10,
           showGrid: false,
           backgroundColor: '#000000',
           useCustomCellColor: false,
@@ -39,6 +53,7 @@
       }
     },
     mounted() {
+      this.fps.currentTime = (new Date()).getTime();
       this.canvasElement = document.getElementById("canvas");
       this.canvas = this.canvasElement.getContext("2d");
 
@@ -81,6 +96,9 @@
           this.intervalId = setInterval(this.tick, 100);
         }
       },
+      toggleStats() {
+        this.fps.show = !this.fps.show;
+      },
       resizeOnPage() {
         this.canvasElement.width  = window.innerWidth;
         this.canvasElement.height = window.innerHeight;
@@ -96,6 +114,26 @@
           }
           this.data[i] = row;
         }
+      },
+      tick () {
+        this.recountFPS();
+        this.generation();
+        this.draw();
+      },
+      recountFPS() {
+        const previousTime = this.fps.currentTime;
+        this.fps.currentTime = (new Date()).getTime();
+
+        const currentDifference = this.fps.currentTime - previousTime;
+
+        this.fps.frameTimeSpacing.push(currentDifference);
+        if (this.fps.frameTimeSpacing.length > AVERAGE_FPS_FRAMES_COUNT) {
+          this.fps.frameTimeSpacing.shift();
+        }
+
+        this.fps.currentFps = 1000 / currentDifference;
+        const averageDifference = this.fps.frameTimeSpacing.reduce((total, num) => { return total + num; }) / this.fps.frameTimeSpacing.length;
+        this.fps.averageFps = 1000 / averageDifference;
       },
       draw() {
         this.canvas.fillStyle = this.style.backgroundColor;
@@ -147,10 +185,6 @@
         } else {
           return `rgb(255,${511 - value},0)`;
         }
-      },
-      tick () {
-        this.generation();
-        this.draw();
       },
       generation () {
         let newData = [];
@@ -207,5 +241,9 @@
 </script>
 
 <style scoped>
-
+#fps {
+  position: absolute;
+  color: #ffffff;
+  bottom: 0;
+}
 </style>
