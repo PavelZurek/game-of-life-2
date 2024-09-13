@@ -4,6 +4,8 @@ function dragElement(elementId, headerId, options) {
     let draggableElement = document.getElementById(elementId);
     let draggableElementHeader = document.getElementById(headerId);
 
+    if (!draggableElement || !draggableElementHeader) return;
+
     let originalElementClickX = 0, originalElementClickY = 0;
 
     if (options) {
@@ -14,6 +16,8 @@ function dragElement(elementId, headerId, options) {
     draggableElementHeader.onmousedown = dragMouseDown;
 
     function dragMouseDown(e) {
+        if (!draggableElement) return;
+
         e = e || window.event;
         e.preventDefault();
         // get the mouse cursor position at startup:
@@ -26,6 +30,8 @@ function dragElement(elementId, headerId, options) {
     }
 
     function elementDrag(e) {
+        if (!draggableElement) return;
+
         e = e || window.event;
         e.preventDefault();
         // set the draggableElement's new position:
