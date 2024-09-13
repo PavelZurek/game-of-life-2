@@ -37,7 +37,7 @@
         canvas: undefined,
         intervalId: undefined,
         fps: {
-          show: true,
+          show: false,
           currentTime: undefined,
           frameTimeSpacing: [],
           currentFps: undefined,
