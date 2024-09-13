@@ -1,4 +1,4 @@
-# game-of-life-2
+# [game-of-life-2](https://pavelzurek.github.io/game-of-life-2/)
 
 ## Project setup
 ```
