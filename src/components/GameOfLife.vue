@@ -245,9 +245,6 @@
         return this.data[row][column] > 0 ? 1 : 0;
       },
       getValues (callback) {
-        console.log({
-          data: this.data
-        })
         for (let i = 0; i < this.sizeX; i++) {
           for (let j = 0; j < this.sizeY; j++) {
             callback(i, j, this.data[i][j]);
