@@ -14,8 +14,18 @@ export default {
 </script>
 
 <style>
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
 body {
   margin: 0;
+  height: 100%;
   overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

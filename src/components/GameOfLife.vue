@@ -57,6 +57,8 @@
       this.canvasElement = document.getElementById("canvas");
       this.canvas = this.canvasElement.getContext("2d");
 
+      document.getElementsByTagName('body')[0].style['background'] = this.style.backgroundColor;
+
       this.resizeOnPage();
 
       this.draw();
@@ -64,10 +66,12 @@
     },
     methods: {
       onCanvasMoveOrClick(mouseEvent) {
-        const x = Math.floor(mouseEvent.clientX / this.style.cellSize);
-        const y = Math.floor(mouseEvent.clientY / this.style.cellSize);
-
         if (mouseEvent.type === 'mousemove' && mouseEvent.buttons === 1 || mouseEvent.type === 'click') {
+          const canvasPosition = this.canvasElement.getBoundingClientRect();
+
+          const x = Math.floor((mouseEvent.clientX - canvasPosition.x) / this.style.cellSize);
+          const y = Math.floor((mouseEvent.clientY - canvasPosition.y) / this.style.cellSize);
+
           this.data[x][y] = mouseEvent.shiftKey ? 0 : 1;
           this.draw();
         }
@@ -77,6 +81,8 @@
           ...this.style,
           ...style
         };
+
+        document.getElementsByTagName('body')[0].style['background'] = this.style.backgroundColor;
 
         if (!this.isGameRunning()) {
           this.draw();
