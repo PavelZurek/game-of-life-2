@@ -102,10 +102,10 @@
         );
       },
       loadSavedState() {
-        const loaded = localStorage.getItem(localStorageKey);
+        const loadedState = JSON.parse(localStorage.getItem(localStorageKey));
 
-        const savedState = Object.fromEntries(
-          loaded.split(',').map((cellInfo) => {
+        const savedData = Object.fromEntries(
+          loadedState.data.split(',').map((cellInfo) => {
             const [x, y, value] = cellInfo.split('-');
             return [`${x}-${y}`, value];
           })
@@ -113,7 +113,7 @@
 
         this.gameController.setValues(
           function (x, y) {
-            return savedState?.[`${x}-${y}`] ?? 0;
+            return savedData?.[`${x}-${y}`] ?? 0;
           }
         );
       },
@@ -128,7 +128,11 @@
           }
         );
 
-        localStorage.setItem(localStorageKey, data.join(','));
+        const stateToSave = {
+          data: data.join(',')
+        }
+
+        localStorage.setItem(localStorageKey, JSON.stringify(stateToSave));
       },
       onMemLoadButtonClick() {
         this.loadSavedState();
