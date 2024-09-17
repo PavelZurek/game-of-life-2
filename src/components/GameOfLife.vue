@@ -4,8 +4,10 @@
       pausePlay: pausePlay,
       step: tick,
       isGameRunning: isGameRunning,
-      setStyle: setStyle,
       getStyle: getStyle,
+      setStyle: setStyle,
+      getValues: getValues,
+      setValues: setValues,
       toggleStats: toggleStats
     }" />
     <canvas id="canvas"
@@ -241,6 +243,29 @@
           column = 0;
         }
         return this.data[row][column] > 0 ? 1 : 0;
+      },
+      getValues (callback) {
+        console.log({
+          data: this.data
+        })
+        for (let i = 0; i < this.sizeX; i++) {
+          for (let j = 0; j < this.sizeY; j++) {
+            callback(i, j, this.data[i][j]);
+          }
+        }
+      },
+      setValues (callback) {
+        let newData = [];
+
+        for (let i = 0; i < this.sizeX; i++) {
+          newData[i] = [];
+          for (let j = 0; j < this.sizeY; j++) {
+            newData[i][j] = Number(callback(i, j));
+          }
+        }
+
+        this.data = newData;
+        this.draw();
       }
     }
   }
